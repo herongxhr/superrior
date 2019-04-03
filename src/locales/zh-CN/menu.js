@@ -1,0 +1,15 @@
+export default {
+  'menu.home': '首页',
+  'menu.dashboard': '工作台',
+  'menu.menucenter': '菜单中心',
+  "menu.menucenter.menulist": '周菜单',
+  "menu.menucenter.menutemplate":'菜单模板',
+  "menu.menucenter.menudetails":'菜单详情',
+  "menu.menucenter.menucustom":'新建菜单',
+  "menu.menucenter.menuupdate":'菜单修改',
+  "menu.menucenter.templatedetails":'模板详情',
+  "menu.menucenter.templatecustom":'新建模板',
+  "menu.menucenter.templateupdate":'修改模板',
+  "menu.dishes":'菜品管理',
+  "menu.listprice":'定价单',
+};

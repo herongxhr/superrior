@@ -1,0 +1,49 @@
+.itemWrap {
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
+    .title {
+        height: 40px;
+        line-height: 40px;
+    }
+    .delivery {
+        height: 32px;
+        line-height: 32px;
+        background: #f5f9fa;
+        border: 1px solid #f1f1f1;
+        border-right: none;
+        
+    }
+    .customLi{
+        text-align: left;
+        margin: 12px 12px 0;
+        padding: 10px;
+        background:#f1f1f1;
+        &:hover {
+            background: #FFF9ED;
+        }
+        .total {
+            width:calc(100% - 50px);
+            text-align: left;
+            display: inline-block;
+        }
+        .accepted, .waitStart, .waitDelivery{
+            display: inline-block;
+            width: 50px;
+            height: 20px;
+            text-align: center;
+            font-size:12px;
+            color: #fff;
+            border-radius: 10px;
+        }
+        .accepted {
+            background: #cecece;
+        }
+        .waitStart {
+            background: #75c382;
+        }
+        .waitDelivery {
+            background: #e97260
+        }
+    }
+}
