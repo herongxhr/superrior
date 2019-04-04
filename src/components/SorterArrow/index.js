@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon } from 'antd';
 import classNames from 'classnames';
-import './index.less';
+import styles from './index.less';
 class SorterArrow extends React.Component {
   constructor(props) {
     super(props)
@@ -25,11 +25,11 @@ class SorterArrow extends React.Component {
   render() {
     const { desc } = this.state;
     return (
-      <div className='top-down' onClick={this.handleSorter}>
+      <div className={styles['top-down']} onClick={this.handleSorter}>
         <Icon type="caret-up"
-          className={classNames({ 'blue-color': desc })} />
+          className={classNames({ [styles['blue-color']]: desc })} />
         <Icon type="caret-down"
-          className={classNames({ 'blue-color': !desc })} />
+          className={classNames({ [styles['blue-color']]: !desc })} />
       </div>
     )
   }

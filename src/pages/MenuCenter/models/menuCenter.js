@@ -8,8 +8,8 @@ import {
     queryPTemplateDetails,
     queryCTemplateDetails,
     queryMenuList,
-    queryDishes,
-} from '../services/api';
+    queryDishList,
+} from '../../../services/api';
 
 export default {
     namespace: 'menuCenter',
@@ -19,8 +19,8 @@ export default {
         // 统一或我的菜单详情
         // menuDetails: {},
         // // 每个菜单中所有的菜品数据
-        // allMealsData: [],
-        // // 餐饮单位模板数据
+        allMealsData: [],
+        // 餐饮单位模板数据
         PMenuTemplate: {},
         // 管理单位模板数据
         CMenuTemplate: {},
@@ -43,18 +43,18 @@ export default {
     effects: {
         // 获取菜单列表
         *fetchMenuList({ payload }, { call, put }) {
-            const data = yield call(queryMenuList, payload);
+            const response = yield call(queryMenuList, payload);
             yield put({
                 type: 'saveMenuList',
-                payload: data,
+                payload: response,
             })
         },
         // // 获取菜单详情,统一接口
         // *fetchMenuDetails({ payload }, { call, put }) {
-        //     const data = yield call(queryMenuDetails, payload);
+        //     const response = yield call(queryMenuDetails, payload);
         //     yield put({
         //         type: 'saveMenuDetails',
-        //         payload: data || {}
+        //         payload: response || {}
         //     });
         // },
         // *deleteMyMenu({ payload }, { call }) {
@@ -75,35 +75,35 @@ export default {
         //     });
         //     // 上传的数据区别在于新建无需id，编辑要
         //     const newData = id ? { ...params, id } : params;
-        //     const data = yield call(queryFunction, newData)
+        //     const response = yield call(queryFunction, newData)
         //     yield put({
         //         type: 'saveCustomMenu',
-        //         payload: data || ''
+        //         payload: response || ''
         //     })
         //     // 执行callback
-        //     data && callback(data);
+        //     response && callback(response);
         // },
         // 我的模板
         *fetchPMenuTemplate({ payload }, { call, put }) {
-            const data = yield call(queryPMenuTemplate, payload);
+            const response = yield call(queryPMenuTemplate, payload);
             yield put({
                 type: 'savePMenuTemplate',
-                payload: data,
+                payload: response,
             })
         },
         // 推荐模板
         *fetchCMenuTemplate({ payload }, { call, put }) {
-            const data = yield call(queryCMenuTemplate, payload);
+            const response = yield call(queryCMenuTemplate, payload);
             yield put({
                 type: 'saveCMenuTemplate',
-                payload: data,
+                payload: response,
             })
         },
         *hasAnyTemplate(_, { call, put }) {
-            const data = yield call(queryAnyNewTemplate)
+            const response = yield call(queryAnyNewTemplate)
             yield put({
                 type: 'saveAnyNewTemplate',
-                payload: data || 0
+                payload: response || 0
             })
         },
         // 对模板进行复制和删除
@@ -120,38 +120,38 @@ export default {
             if (action === 'saveAsMy') {
                 actionFunc = toSaveAsMyTemplate;
             }
-            const data = yield call(actionFunc, id);
+            const response = yield call(actionFunc, id);
             // 把操作结果保存一下
             yield put({
                 type: 'saveTemplateActionResult',
-                payload: data,
+                payload: response,
             });
             if (callback) callback();
         },
         // 获取我的模板详情数据
         *fetchPTemplateDetails({ payload }, { call, put }) {
-            const data = yield call(queryPTemplateDetails, payload);
+            const response = yield call(queryPTemplateDetails, payload);
             yield put({
                 type: 'saveTemplateDetails',
-                payload: data,
+                payload: response,
             });
         },
         // 获取我的模板详情数据
         *fetchCTemplateDetails({ payload }, { call, put }) {
-            const data = yield call(queryCTemplateDetails, payload);
+            const response = yield call(queryCTemplateDetails, payload);
             yield put({
                 type: 'saveTemplateDetails',
-                payload: data,
+                payload: response,
             });
         },
-       // 获取菜品数据 
-       *fetchDishes({ payload }, { call, put }) {
-        const data = yield call(queryDishes, payload);
-        yield put({
-            type: 'saveDishes',
-            payload: data
-        })
-    },
+        // 获取菜品数据 
+        *getDishList({ payload }, { call, put }) {
+            const response = yield call(queryDishList, payload);
+            yield put({
+                type: 'saveDishes',
+                payload: response || {}
+            })
+        },
         // // 新建或编辑模板
         // *customTemplate({ payload }, { call, put, select }) {
         //     const { id, callback } = payload;
@@ -168,22 +168,22 @@ export default {
         //     });
         //     // 上传的数据区别在于新建无需id，编辑要
         //     const newData = id ? { ...params, id } : params;
-        //     const data = yield call(queryFunction, newData)
+        //     const response = yield call(queryFunction, newData)
         //     yield put({
         //         type: 'saveCustomTemplateResult',
-        //         payload: data || ''
+        //         payload: response || ''
         //     })
         //     // 执行callback
-        //     data && callback();
+        //     response && callback();
         // },
 
- 
+
         // *queryFoodDetail({ payload }, { call, put }) {
-        //     const data = yield call(queryFoodDetail, payload);
-        //     console.log(data)
+        //     const response = yield call(queryFoodDetail, payload);
+        //     console.log(response)
         //     yield put({
         //         type: 'saveDishesDetail',
-        //         payload: data || {}
+        //         payload: response || {}
         //     })
         // },
     },
@@ -192,7 +192,7 @@ export default {
         saveMenuList(state, { payload }) {
             return {
                 ...state,
-                menuList: payload || {}
+                menuList: payload.data || {}
             }
         },
         // 保存菜单详情
@@ -206,13 +206,13 @@ export default {
         savePMenuTemplate(state, { payload }) {
             return {
                 ...state,
-                PMenuTemplate: payload || {}
+                PMenuTemplate: payload.data || {}
             }
         },
         saveCMenuTemplate(state, { payload }) {
             return {
                 ...state,
-                CMenuTemplate: payload || {}
+                CMenuTemplate: payload.data || {}
             }
         },
         // 保存我的或推荐模板详情
@@ -229,7 +229,7 @@ export default {
         saveDishes(state, { payload }) {
             return {
                 ...state,
-                dishesData: payload || {}
+                dishesData: payload.data || {}
             }
         },
         // 清空state中的菜单/模板的排餐数据
@@ -304,7 +304,7 @@ export default {
         saveAnyNewTemplate(state, { payload }) {
             return {
                 ...state,
-                anyNewTemplate: payload
+                anyNewTemplate: payload.data || 0
             }
         },
         saveDishesDetail(state, { payload }) {

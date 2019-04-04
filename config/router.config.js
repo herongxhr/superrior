@@ -29,13 +29,13 @@ export default [
                         component: './MenuCenter/MenuTemplate'
                     },
                     { // 菜单详情
-                        path: './menu/details',
+                        path: './menu-list/details',
                         name: 'menudetails',
                         hideInMenu: true,
                         component: './MenuCenter/MenuDetails'
                     },
                     { // 新建菜单
-                        path: './menu/custom',
+                        path: './menu-list/custom',
                         name: 'menucustom',
                         hideInMenu: true,
                         component: './MenuCenter/CustomMenu'

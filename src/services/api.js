@@ -1,8 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-
-
 // 主面板
 export async function queryDeliveryData(params) {
   return request(`/workbench/distribution/listQuery`);
@@ -12,6 +10,53 @@ export async function queryOrdersProgress(params) {
 }
 export async function queryAddressBook(params) {
   return request(`/workbench/catering/listQuery`);
+}
+
+// 菜单中心
+export async function queryPMenuTemplate(params) {
+  return request(`/menuTemplate/pageQuery?${stringify(params)}`)
+}
+export async function queryCMenuTemplate(params) {
+  return request(`/menuTemplate/recommend/pageQuery?${stringify(params)}`)
+}
+export async function queryAnyNewTemplate() {
+  return request(`/menuTemplate/recommend/count`)
+}
+export async function toCopyTemplate(id) {
+  return request(`/menuTemplate/${id}/copy`, {
+    method: 'POST',
+  });
+}
+export async function toDeleteTemplate(id) {
+  return request(`/menuTemplate/${id}`, {
+    method: 'POST',
+    body: {
+      id,
+      method: 'delete',
+    },
+  });
+}
+export async function toSaveAsMyTemplate(id) {
+  return request(`/menuTemplate/recommend/copy/${id}`, {
+    method: 'POST',
+    body: {
+      id,
+      method: 'post',
+    },
+  });
+}
+
+export async function queryPTemplateDetails(id) {
+  return request(`/menuTemplate/vo/${id}`)
+}
+export async function queryCTemplateDetails(id) {
+  return request(`/menuTemplate/recommend/copy/${id}`)
+}
+export async function queryMenuList(params) {
+  return request(`/menu/pageQuery?${stringify(params)}`)
+}
+export async function queryDishList(params) {
+  return request(`/pub/food/pageQuery?${stringify(params)}`)
 }
 
 export async function queryRule(params) {

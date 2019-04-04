@@ -1,7 +1,6 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { connect } from 'dva';
 import { Layout } from 'antd';
-import Footer from './Footer';
 import Header from './Header';
 import SiderMenu from '@/components/SiderMenu';
 import logo from '../assets/logo.svg';
@@ -43,7 +42,6 @@ const query = {
 };
 class BasicLayout extends React.Component {
     componentDidMount() {
-        console.log('didmout',this.props)
         const {
             dispatch,
             route: { routes, authority },
@@ -63,7 +61,6 @@ class BasicLayout extends React.Component {
         });
     }
 
-    // 不涉及this可以不用箭头函数
     getContext() {
         const { location, breadcrumbNameMap } = this.props;
         return {
@@ -89,15 +86,6 @@ class BasicLayout extends React.Component {
             type: 'global/changeLayoutCollapsed',
             payload: collapsed,
         });
-    };
-
-    renderSettingDrawer = () => {
-        // Do not render SettingDrawer in production
-        // unless it is deployed in preview.pro.ant.design as demo
-        if (process.env.NODE_ENV === 'production' && APP_TYPE !== 'site') {
-            return null;
-        }
-        return <SettingDrawer />;
     };
 
     render() {
@@ -159,7 +147,6 @@ class BasicLayout extends React.Component {
                         )}
                     </ContainerQuery>
                 </DocumentTitle>
-                {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
             </React.Fragment>
         );
     }

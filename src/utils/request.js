@@ -69,7 +69,7 @@ export default function request(url, option) {
     ...option,
   };
 
-  const pathName = '/supplier';
+  const pathName = '/superior';
   /\/pub/.test(url) && (pathName = '');
   url = `http://anpin.jgzh.test${pathName}${url}`;
   

@@ -10,7 +10,7 @@ import { routerRedux } from 'dva/router';
 const history = createHistory();
 const { WeekPicker, } = DatePicker;
 /**
- * 从模板新建菜单与自定义菜单共用一个页面
+ * 从模板新建菜单与修改菜单共用一个页面
  */
 class CustomMenu extends Component {
   state = {
@@ -91,7 +91,7 @@ class CustomMenu extends Component {
       <div>
         <BreadcrumbComponent {...location} />
         <Card className={styles.wrap}>
-          <Row>
+          <Row className={styles.rows}>
             <Col span={8}>适用周次：<WeekPicker
               ref={ref => this.weekpicker = ref}
               style={{ width: 260 }}
@@ -100,8 +100,10 @@ class CustomMenu extends Component {
             />
             </Col>
           </Row>
+          {/* 餐饮单位 */}
           <Row>
-            <Col></Col>
+            <Col className={styles.rows}>餐饮单位：</Col>
+            <Col className={styles.rows}></Col>
           </Row>
         </Card>
         <Card
@@ -109,7 +111,7 @@ class CustomMenu extends Component {
           style={{ marginBottom: 76 }}
           bodyStyle={{ padding: 20 }}>
           {/* 排餐控件 */}
-          <ArrangeDishes isMy={true} {...this.props} />
+          <ArrangeDishes  {...this.props} />
         </Card>
         {/* 底部按钮 */}
         <div className={styles.footerWrap}>

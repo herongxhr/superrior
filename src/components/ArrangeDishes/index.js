@@ -2,37 +2,32 @@ import React, { Component } from 'react';
 import { routerRedux } from 'dva/router';
 import SelectDishes from '../SelectIDishes';
 import classNames from 'classnames';
-import { Button, Tag, Dropdown, Menu } from 'antd';
-import { sortMealsData } from '../../utils/utils';
+import { Button } from 'antd';
 import styles from './index.module.less';
 
-// 定义加菜按钮
-const menu = (<Menu >
-    <Menu.Item id='everyone' key='all'>所有人</Menu.Item>
-    <Menu.Item id='forStaff' key='forStaff'>教职工</Menu.Item>
-</Menu>)
-const addBtn = (<div>
-    <Dropdown overlay={menu}>
-        <Button className={styles.addBtn} type='dashed'>+添加</Button>
-    </Dropdown>
-</div>)
-// 组件要接收arrangedMeals数据，
-// 即camenuDetailVOMap和camenuTemplateDetailVOMap
-// 还要接收menuCenter state中周一到周日每天的排餐数据
+const sortMealsData = (objectArray = [], property) => {
+    return objectArray.length > 0 && objectArray.reduce((acc, obj) => {
+        let key = obj[property];
+        if (!acc[key]) {
+            acc[key] = [];
+        }
+        acc[key].push(obj);
+        return acc;
+    }, {});
+}
+
+// 组件要接收allMealsData数据，
+// 还要接收menu菜单/template模板中的排菜数据
 export default class ArrangeDishes extends Component {
     state = {
-        // 显示选菜/选食材弹出框
+        // 显示选菜modal
         showModal: false,
         // 当前操作列也就是餐次
         mealTimes: '',
         // 当前操作行也就是周次
         zj: '',
-        // 是不是教职工菜
-        forStaff: false,
-        // 是不是自己加的菜
-        isAdd: false,
         // 当前操作的菜品id
-        currFoodId: ''
+        foodId: ''
     }
 
     // 选菜/选食材弹出框中点击确定或取消的回调
@@ -58,22 +53,16 @@ export default class ArrangeDishes extends Component {
         if (e.target.nodeName !== 'LI') return;
         // 添加按钮本身有id, 更换和删除的id在parentNode上
         const foodId = e.target.id || e.target.parentNode.id;
-        // 根据e.target.id来判断是职工餐还是自己加的菜
-        let forStaff = foodId === 'forStaff';
-        let isAdd = foodId === 'everyone' || foodId === 'forStaff';
         // 记录当前点击菜名的id，要考虑点了按钮的情况
-        let currFoodId = (!isAdd && foodId) || '';
         const flag = e.target.getAttribute('flag') || null;
         this.setState({
             mealTimes,
             zj,
-            forStaff,
-            isAdd,
-            currFoodId
+            foodId
         }, () => {
             // 点击了删除按钮,则执行删除操作
             if (flag === '-1') {
-                this.changeArrangedMeals({ id: this.state.currFoodId }, -1);
+                this.changeArrangedMeals({ id: this.state.foodId }, -1);
                 return;
             }
             this.showModal();
@@ -84,7 +73,6 @@ export default class ArrangeDishes extends Component {
     // flag为1为添加，-1时为删除，0为替换
     // 使用state中的zj和mealTimes定位单元格
     changeArrangedMeals = (record, flag) => {
-        const { isAdd } = this.state;
         this.props.dispatch({
             type: 'menuCenter/changeArrangedMeals',
             payload: {
@@ -94,17 +82,17 @@ export default class ArrangeDishes extends Component {
             }
         });
         // 当换过一次菜后，将之前所换菜的id设为currFoodId
-        if (!isAdd) {
+        if (flag === 0) {
             this.setState({
-                currFoodId: record.id
+                foodId: record.id
             })
         }
     };
 
     // 选菜或选食材中筛选区域
-    getDishes = params => {
-       this.props.dispatch({
-            type: 'menuCenter/fetchDishes',
+    getDishList = params => {
+        this.props.dispatch({
+            type: 'menuCenter/fetchDishList',
             payload: params
         })
     }
@@ -135,19 +123,20 @@ export default class ArrangeDishes extends Component {
         }
     }
 
-    // 构造表格行的DOM
-    renderWeekday = weekday => {
+    // 构造表格行
+    renderWeekdayRow = weekday => {
         const getTD = this.getMealsTD;
         const weekdaysName = ['一', '二', '三', '四', '五', '六', '日'];
         const mealsName = ['ZD', 'ZC', 'DX', 'WC'];//早点，中餐，点心，晚餐
+        // 新建时allMealsData为空[]
         const { allMealsData } = this.props;
-        // 按周几排列菜品数据
+        // 按周几排列菜品数据,空数组[]执行函数后为空对象{}
         const mealsSortedByWeekday = sortMealsData(allMealsData, 'zj');
-        // 再把其中一天的数据按餐次进行排序
+        // 再把其中一天的数据按餐次进行排序，不一定每天都有数据，此时取默认值{}
         const oneDayMealsSorted = mealsSortedByWeekday[weekday] != null
             ? sortMealsData(mealsSortedByWeekday[weekday], 'mealTimes') : {};
         return (
-            // 表示一星期中某一天的行
+            // 表示一星期中某一天的行, 没有数据为但有按钮空行，
             <tr key={weekday}>
                 {/* 表示星期几的单元格 */}
                 <td>{weekdaysName[weekday * 1 - 1]}</td>
@@ -160,7 +149,7 @@ export default class ArrangeDishes extends Component {
                     return (
                         <td key={mealName} onClick={e => this.handleShowModal(e, weekday, mealName)}>
                             {oneMeal}
-                            {addBtn}
+                            {<Button className={styles.addBtn} type='dashed'>+添加</Button>}
                         </td>
                     )
                 })}
@@ -175,37 +164,34 @@ export default class ArrangeDishes extends Component {
     * @param{boolean} showDetail 是否显示配料详情
     */
     getMealsTD = (meals = []) => {
-        const { isMy = true } = this.props;
         if (meals.length) {// 如果当前餐次有作安排
             return (<ul>
                 {meals.map((item, index) => {
                     // 防止报错，菜品信息数据
                     const viewFood = item.viewFood || {};
-                    // li负责展示每一个菜品，自己加的菜背景色不一样
-                    return (<li key={index} className={classNames({ [styles.isAdd]: item.isAdd })}>
-                        <span className={styles.dishName}>{viewFood.foodName}</span>
-                        {item.forStaff &&
-                            <Tag color='orange' className={styles.tag}>教职工</Tag>}
-                        {/* 自己加的悬浮时会显示删除按钮 */}
-                        <ul id={item.foodId} className={styles.actionsWrap}>
-                            <li className={
-                                classNames(styles.changeBtn, { [styles.onlyChange]: (!item.isAdd && !isMy) })
-                            }>更换</li>
-                            {(item.isAdd || isMy) && <li flag='-1' className={styles.deleteBtn}>删除</li>}
-                        </ul>
-                    </li>)
-                }
-                )}
+                    // li负责展示每一个菜品
+                    return (
+                        <li key={index} >
+                            <span className={styles.dishName}>{viewFood.foodName}</span>
+                            {/* 自己加的悬浮时会显示删除按钮 */}
+                            <ul id={item.foodId} className={styles.actionsWrap}>
+                                <li flag='0' className={styles.changeBtn}>更换</li>
+                                <li flag='-1' className={styles.deleteBtn}>删除</li>
+                            </ul>
+                        </li>
+                    )
+                })}
             </ul>)
         }
     }
+
     render() {
         const {
             className,
-            // 所有菜品
+            // 选菜modal数据
             dishesData,
         } = this.props;
-        const { mealTimes, zj, isAdd } = this.state;
+        const { mealTimes, zj } = this.state;
         const clsString = classNames(styles.arrangeDishes, className);
         // 简洁显示星期几
         const weekdayNum = ['1', '2', '3', '4', '5', '6', '7'];
@@ -221,14 +207,12 @@ export default class ArrangeDishes extends Component {
                     <tbody>
                         {/* 周一到周日都调用一下方法生成表格行 */}
                         {weekdayNum.map(weekday =>
-                            this.renderWeekday(weekday)
+                            this.renderWeekdayRow(weekday)
                         )}
                     </tbody>
                 </table>
                 {/* 弹出的选菜/或选食材modal */}
                 <SelectDishes
-                    // 是否加菜或换菜
-                    isAdd={isAdd}
                     // modal的显示属性
                     visible={this.state.showModal}
                     // 隐藏modal的方法
@@ -236,14 +220,16 @@ export default class ArrangeDishes extends Component {
                     // 菜品数据
                     dishesData={dishesData}
                     // 获取菜品方法
-                    getDishes={this.getDishes}
+                    getDishes={this.getDishList}
                     // 选择类别下拉框时的回调
                     doFilter={this.handlFetchDishes}
                     // 关闭标签时的回调
                     changeArrangedMeals={this.changeArrangedMeals}
+                    // 早/中/晚/点心
                     mealTimes={mealTimes}
+                    // 周几
                     zj={zj}
-                    // 当前周次和餐次中菜品数据
+                    // 当前周次的某餐次中菜品数据
                     currTDMeals={this.getCurrTDMeals()}
                 />
             </div>

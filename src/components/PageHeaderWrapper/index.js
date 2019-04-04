@@ -38,7 +38,7 @@ const renderFooter = ({ tabList, activeKeyProps, onTabChange, tabBarExtraContent
 const PageHeaderWrapper = ({
   children,
   contentWidth,
-  wrapperClassName,
+  className,
   top,
   title,
   content,
@@ -47,7 +47,7 @@ const PageHeaderWrapper = ({
   ...restProps
 }) => {
   return (
-    <div style={{ margin: '-24px -24px 0' }} className={classNames(classNames, styles.main)}>
+    <div style={{ margin: '104px -24px 0' }} className={classNames(className, styles.main)}>
       {top}
       {title && content && (
         // 标题和面包屑区域

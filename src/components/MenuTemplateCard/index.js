@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Spin, Popconfirm, Row, Col, Tag } from 'antd';
 import { getYMD, getYMDHms } from '../../utils/utils';
-import './index.less';
+import styles from './index.less';
 
 export default class MenuTemplateCard extends React.Component {
   state = {
@@ -54,14 +54,14 @@ export default class MenuTemplateCard extends React.Component {
     return (
       <Spin spinning={spinning}>
         <Card
-          className={"menuTemplateCard"}
+          className={styles.menuTemplateCard}
           bodyStyle={{ height: 147, padding: 20 }}
           actions={templateType === 'P' ? pTemplateCardFooter : cTemplateCardFooter}
           onMouseOver={this.handleMouseOver}
           onMouseLeave={this.handleMouseOut}
           onClick={e => handleTemplateActions(e, id)}
         >
-          <div className='templateCardContent'>
+          <div className={styles.templateCardContent}>
             <Row style={{ marginBottom: 16 }} span={24} >
               <Col span={16}>{itemData.templateName}</Col>
               <Col style={{ textAlign: 'right' }} span={8}>{itemData.used || 0}次</Col>
